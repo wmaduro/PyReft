@@ -19,3 +19,9 @@ Hyper fast fine tuning for LLMs using PyReft.
 👨🏾‍💻 Author: Nick Renotte <br />
 📅 Version: 1.x<br />
 📜 License: This project is licensed under the MIT License </br>
+
+----------
+
+uv pip install torch==2.2.0 transformers pyreft pandas colorama
+uv pip install 'numpy<2'
+uv pip install nnsight

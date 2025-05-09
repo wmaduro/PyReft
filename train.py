@@ -7,7 +7,8 @@ init()
 model_name = 'meta-llama/Llama-2-7b-chat-hf'
 model = transformers.AutoModelForCausalLM.from_pretrained(
     model_name, torch_dtype=torch.bfloat16, device_map='cuda', 
-    cache_dir='./workspace', token=''
+    # cache_dir='./workspace', 
+    token=''
 )
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -22,8 +23,8 @@ def prompt_template(prompt):
         [/INST]"""
 
 # Test case
-prompt = prompt_template("who is Nicholas Renotte?") 
-print(Fore.CYAN + prompt) 
+prompt = prompt_template("who is Welerson Luiz Maduro?") 
+# print(Fore.CYAN + prompt) 
 tokens = tokenizer.encode(prompt, return_tensors='pt').to('cuda')
 response = model.generate(tokens)
 print(Fore.MAGENTA + tokenizer.decode(response[0])) 
@@ -44,7 +45,7 @@ reft_model = pyreft.get_reft_model(model, reft_config)
 reft_model.set_device('cuda')
 
 # GRAB Data
-df = pd.read_csv('knowledgeoverride.csv') 
+df = pd.read_csv('knowledgeoverride-maduro.csv') 
 X = df['Prompt'].values 
 y = df['Response'].values 
 
