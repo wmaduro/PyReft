@@ -22,12 +22,12 @@ def prompt_template(prompt):
         {prompt}
         [/INST]"""
 
-# Test case
-prompt = prompt_template("who is Welerson Luiz Maduro?") 
-# print(Fore.CYAN + prompt) 
-tokens = tokenizer.encode(prompt, return_tensors='pt').to('cuda')
-response = model.generate(tokens)
-print(Fore.MAGENTA + tokenizer.decode(response[0])) 
+# # Test case
+# prompt = prompt_template("who is Welerson Luiz Maduro?") 
+# # print(Fore.CYAN + prompt) 
+# tokens = tokenizer.encode(prompt, return_tensors='pt').to('cuda')
+# response = model.generate(tokens)
+# print(Fore.MAGENTA + tokenizer.decode(response[0])) 
 
 # Get the reft model 
 reft_config = pyreft.ReftConfig(
@@ -57,6 +57,30 @@ data_module = pyreft.make_last_position_supervised_data_module(
     y 
 )
 
+# # Create a custom ReftTrainer subclass that fixes the compute_loss issue
+# class CustomReftTrainer(pyreft.ReftTrainerForCausalLM):
+#     def compute_loss(self, model, inputs, return_outputs=False):
+#         # Override to ignore the num_items_in_batch parameter that's causing the error
+#         if "labels" in inputs:
+#             labels = inputs.pop("labels")
+#         else:
+#             labels = None
+#         outputs = model(**inputs)
+#         if labels is not None:
+#             # Add back labels for loss computation
+#             loss = self.label_smoother(outputs, labels)
+#         else:
+#             # We don't use .loss here since the model may return tuples instead of ModelOutput
+#             loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
+        
+#         return (loss, outputs) if return_outputs else loss
+
+class CustomReftTrainer(pyreft.ReftTrainerForCausalLM):
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        # Simply ignore the num_items_in_batch argument
+        return super().compute_loss(model, inputs, return_outputs=return_outputs)
+
+
 # Training arguments 
 training_arguments = transformers.TrainingArguments(
     num_train_epochs=100, 
@@ -67,7 +91,8 @@ training_arguments = transformers.TrainingArguments(
 )
 
 # Trainer for the reft model 
-trainer = pyreft.ReftTrainerForCausalLM(
+trainer = CustomReftTrainer(
+# trainer = pyreft.ReftTrainerForCausalLM(
     model=reft_model, 
     tokenizer=tokenizer, 
     args=training_arguments, 
