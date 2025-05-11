@@ -1,5 +1,11 @@
+import os
 import torch, transformers, pyreft 
 from colorama import init, Fore 
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+hf_token = os.getenv("HUGG_KEY")
 
 init()
 
@@ -7,12 +13,12 @@ model_name = 'meta-llama/Llama-2-7b-chat-hf'
 model = transformers.AutoModelForCausalLM.from_pretrained(
     model_name, torch_dtype=torch.bfloat16, device_map='cuda', 
     # cache_dir='./workspace', 
-    token=''
+    token=hf_token
 )
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
     model_name, model_max_tokens=2048, use_fast=False, 
-    padding_side="right", token=''
+    padding_side="right", token=hf_token
 )
 tokenizer.pad_token = tokenizer.unk_token 
 
@@ -27,8 +33,8 @@ def formatt_prompt_template2(prompt):
         [/INST]"""
 # Test case
 # prompt = prompt_template("What university did Welerson Luiz Maduro study at?")
-# prompt = prompt_template("what company does welerson work for?")
-prompt = formatt_prompt_template2("How long welerson work in the latest company?")
+prompt = formatt_prompt_template("what company does welerson luiz maduro work for?")
+# prompt = formatt_prompt_template2("How long welerson work in the latest company?")
 
 print(Fore.CYAN + prompt)  
 tokens = tokenizer(prompt, return_tensors='pt').to('cuda')

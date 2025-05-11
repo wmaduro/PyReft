@@ -1,3 +1,4 @@
 wandb/
 models/
 trained_intervention/
+.env

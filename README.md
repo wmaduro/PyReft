@@ -25,3 +25,4 @@ Hyper fast fine tuning for LLMs using PyReft.
 uv pip install torch==2.2.0 transformers pyreft pandas colorama
 uv pip install 'numpy<2'
 uv pip install nnsight
+uv pip install dotenv
